@@ -1,0 +1,69 @@
+import datetime
+import psycopg2
+import tkinter
+from datetime import datetime
+from tkinter import *
+
+
+def insert_input(station_naam, naam, bericht, datum, tijd):
+    con = psycopg2.connect(
+        host='localhost',  # De host waarop je database runt
+        database='Project A',  # Database naam
+        user='postgres',  # Als wat voor gebruiker je connect, standaard postgres als je niets veranderd
+        password='Ouassim@2002',  # Wachtwoord die je opgaf bij installatie
+    )
+
+    cur = con.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS Reiziger (reizigerid SERIAL primary key,"
+                "naam VARCHAR(255), "
+                "stationnaam VARCHAR(255), "
+                "bericht VARCHAR(255),"
+                "Datum DATE,"
+                "Tijd TIME,"
+                "beoordeling VARCHAR(140))")
+    con.commit()
+
+    sql = """INSERT INTO bericht(naam, station_naam, bericht, Datum, Tijd) values(%s, %s, %s, %s, %s)"""
+    cur.execute(sql, (naam, station_naam, bericht, datum, tijd))
+
+    con.commit()
+    cur.close()
+    con.close()
+
+def get_user_input():
+    station_naam = entry_station_naam.get()
+    naam = entry_naam.get()
+    bericht = str(Tbox_bericht.get("1.0", "end-1c"))
+    datum = datetime.now().date()
+    tijd = str(datetime.now().strftime("%H:%M:%S"))
+    insert_input(station_naam, naam, bericht, datum, tijd)
+
+
+root = Tk()
+label_titel = Label(master=root,
+                    text="Welkom reiziger, deel je reiservaring!",
+                    background='Yellow',
+                    foreground='Blue',
+                    font=('Arial', 15,),
+                    width=50,
+                    height=1)
+label_titel.pack()
+
+label_station = Label(root, text="Op welk station ben je?")
+label_station.pack()
+entry_station_naam = Entry(master=root)
+entry_station_naam.pack(padx=10, pady=10)
+
+label_naam = Label(root, text="Wat is je naam?", )
+label_naam.pack()
+entry_naam = Entry(master=root)
+entry_naam.pack(padx=10, pady=10)
+
+label_bericht = Label(root, text="Wat wil je delen?")
+label_bericht.pack()
+Tbox_bericht = tkinter.Text(width=20, height=3)
+Tbox_bericht.pack()
+
+button = Button(master=root, text='Verstuur je bericht', command=get_user_input)
+button.pack(fill=X, padx=150, pady=10, )
+root.mainloop()
