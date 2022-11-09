@@ -1,0 +1,41 @@
+from tkinter import *
+import tkinter
+import psycopg2
+
+
+con = psycopg2.connect(
+        host='localhost',  # De host waarop je database runt
+        database='Project A',  # Database naam
+        user='postgres',  # Als wat voor gebruiker je connect, standaard postgres als je niets veranderd
+        password='Ouassim@2002',  # Wachtwoord die je opgaf bij installatie
+    )
+cur = con.cursor()
+
+cur.execute("SELECT * from bericht")
+rows = cur.fetchall()
+
+for row in rows:
+    print("bericht :",row[2])
+    print("date :",row[3])
+
+root = Tk()
+root.geometry('500x500')
+l1 = Label(master=root,
+           text="NS",
+           background='Yellow',
+           foreground='blue',
+           font=('Arial', 40,),
+           width=5,
+           height=1)
+l1.pack()
+button_toon_bericht = Button(master=root, text='Toon bericht')#, command=klik_button)
+button_toon_bericht.pack(fill=X, padx=180, pady=50, )
+l3 = Label(root, text="Accept of Reject?")
+l3.pack()
+button_goedgekeurd = Button(master=root, text='Accept')#, command=klik_button)
+button_goedgekeurd.pack(fill=X, padx=180, pady=10, )
+button_afgekeurd= Button(master=root, text='Reject')#, command=klik_button)
+button_afgekeurd.pack(fill=X, padx=180, pady=10, )
+button_opslaan = Button(master=root, text='opslaan')#, command=klik_button)
+button_opslaan.pack(fill=X, padx=180, pady=50, )
+root.mainloop()
