@@ -2,21 +2,64 @@ from tkinter import *
 import tkinter
 import psycopg2
 
-
-con = psycopg2.connect(
+def show_message():
+    con = psycopg2.connect(
         host='localhost',  # De host waarop je database runt
         database='Project A',  # Database naam
         user='postgres',  # Als wat voor gebruiker je connect, standaard postgres als je niets veranderd
         password='Ouassim@2002',  # Wachtwoord die je opgaf bij installatie
     )
-cur = con.cursor()
+    cur = con.cursor()
 
-cur.execute("SELECT * from bericht")
-rows = cur.fetchall()
+    cur.execute("SELECT bericht FROM bericht ORDER BY id DESC LIMIT 1")
+    row = cur.fetchone()
 
-for row in rows:
-    print("bericht :",row[2])
-    print("date :",row[3])
+    if row:
+        message = row[0]
+    else:
+        message = "No message found in the database."
+
+    cur.close()
+    con.close()
+
+    # Create a new label to display the message
+    message_label = Label(root, text=message)
+    message_label.pack()
+
+    def accept_message():
+        con = psycopg2.connect(
+            host='localhost',
+            database='Project A',
+            user='postgres',
+            password='Ouassim@2002',
+        )
+        cur = con.cursor()
+
+        cur.execute(
+            "UPDATE bericht SET goedgekeurd = True WHERE id = (SELECT id FROM bericht ORDER BY id DESC LIMIT 1)")
+        con.commit()
+        cur.close()
+        con.close()
+
+    def reject_message():
+        con = psycopg2.connect(
+            host='localhost',
+            database='Project A',
+            user='postgres',
+            password='Ouassim@2002',
+        )
+        cur = con.cursor()
+
+        cur.execute(
+            "UPDATE bericht SET goedgekeurd = False WHERE id = (SELECT id FROM bericht ORDER BY id DESC LIMIT 1)")
+        con.commit()
+        cur.close()
+        con.close()
+
+    button_goedgekeurd = Button(master=root, text='Accept', command=accept_message)
+    button_goedgekeurd.pack(fill=X, padx=180, pady=10, )
+    button_afgekeurd = Button(master=root, text='Reject', command=reject_message)
+    button_afgekeurd.pack(fill=X, padx=180, pady=10, )
 
 root = Tk()
 root.geometry('500x500')
@@ -28,14 +71,7 @@ l1 = Label(master=root,
            width=5,
            height=1)
 l1.pack()
-button_toon_bericht = Button(master=root, text='Toon bericht')#, command=klik_button)
+button_toon_bericht = Button(master=root, text='Toon bericht', command=show_message)
 button_toon_bericht.pack(fill=X, padx=180, pady=50, )
 l3 = Label(root, text="Accept of Reject?")
-l3.pack()
-button_goedgekeurd = Button(master=root, text='Accept')#, command=klik_button)
-button_goedgekeurd.pack(fill=X, padx=180, pady=10, )
-button_afgekeurd= Button(master=root, text='Reject')#, command=klik_button)
-button_afgekeurd.pack(fill=X, padx=180, pady=10, )
-button_opslaan = Button(master=root, text='opslaan')#, command=klik_button)
-button_opslaan.pack(fill=X, padx=180, pady=50, )
 root.mainloop()
