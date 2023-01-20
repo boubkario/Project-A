@@ -1,0 +1,38 @@
+from tkinter import *
+import psycopg2
+
+def show_approved_messages():
+    con = psycopg2.connect(
+        host='localhost',
+        database='Project A',
+        user='postgres',
+        password='Ouassim@2002',
+    )
+    cur = con.cursor()
+
+    cur.execute("SELECT bericht FROM bericht WHERE goedgekeurd = True")
+    rows = cur.fetchall()
+
+    approved_messages_window = Toplevel(root)
+    approved_messages_window.geometry('500x500')
+    approved_messages_window.configure(bg = "yellow")
+
+    messages_label = Label(approved_messages_window, text="Goedgekeurde berichten:", font=('Arial', 20), bg = "yellow",fg = "blue" )
+    messages_label.pack(padx=20, pady=20)
+
+    for row in rows:
+        message = row[0]
+        message_label = Label(approved_messages_window, text=message, font=('Arial', 14), bg = "yellow",fg = "blue" )
+        message_label.pack(padx=20, pady=5)
+
+    cur.close()
+    con.close()
+
+root = Tk()
+root.geometry('500x500')
+root.configure(bg = "blue")
+
+approved_messages_button = Button(root, text='Goedgekeurde berichten', command=show_approved_messages,font=('Arial', 20), bg = "blue",fg = "yellow")
+approved_messages_button.pack(padx=20, pady=20)
+
+root.mainloop()
